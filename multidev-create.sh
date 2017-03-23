@@ -4,25 +4,34 @@
 # Usage info
 show_help() {
     cat <<"EOF"
-usage: mdcreate [<args>]
 
-These are the options that can be passed to a script:
-    [-m=<multidev>], [-s|--site=<site>] and [-f|--from-env=<FROM>]
+usage:
+    sh multidev-create.sh [<args>]
+or
+    mdcreate [<args>]
+
+These are the arguments that are accepted by the script:
+    [-m=<multidev>], [-s|--site=<site>] and [-f|--from-env=<FROM_ENV>]
 
 Example usage:
-    mdcreate -m multidev -s sitename -f dev
+    '$ sh multidev-create.sh -m multidev -s yoursite -f dev'
+    '$ mdcreate -m multidev -s yoursite -f dev'
+
+To cancel a currently running command/script, press [Ctrl+C]
+
 EOF
 }
 
+ALIAS="mdcreate"
+MD_NAME=""
+SITE=""
+FROM_ENV=""
+
 if [[ $# -eq 0 ]]; then
-    echo " Not enough arguments. See 'mdcreate --help'." >&2
+    echo " Not enough arguments. See '$ALIAS --help'." >&2
     show_help
     exit 1
 else
-    MD_NAME=""
-    SITE=""
-    FROM=""
-
     while [[ $# -gt 0 ]]; do
         key="$1"
 
@@ -58,17 +67,17 @@ else
             -f|--from-env)
                 if [[ -z $2 || $2 == -* ]]; then
                     echo " \033[1;97;46m[notice]\033[0m Option $1 is missing an argument."
-                    while [ -z $FROM ]; do
-                        printf " Provide the \033[1;32;40m[FROM]\033[0m environment name to create multidev on and press [ENTER]: "
-                        read -r FROM;
+                    while [ -z $FROM_ENV ]; do
+                        printf " Provide the \033[1;32;40m[FROM_ENV]\033[0m environment name to create multidev on and press [ENTER]: "
+                        read -r FROM_ENV;
                     done
                 else
-                    FROM="$2"
+                    FROM_ENV="$2"
                     shift # past argument
                 fi
             ;;
             *)
-                echo " \033[1;97;41m[error]\033[0m Unknown option $1. See 'mdcreate --help'." >&2
+                echo " \033[1;97;41m[error]\033[0m Unknown option $1. See '$ALIAS --help'." >&2
                 show_help
                 exit 1
             ;;
@@ -76,18 +85,18 @@ else
         shift # past argument or value
     done
 
-    if [[ -z $SITE && -z $FROM && -z $MD_NAME ]]; then
+    if [[ -z $SITE || -z $FROM_ENV || -z $MD_NAME ]]; then
         #Final check in case our script failed to collect required info
-        echo " Not enough arguments. See 'mdcreate --help'." >&2
+        echo " Not enough arguments. See '$ALIAS --help'." >&2
         exit 1
     else
         #Authenticate Terminus
         terminus auth:login
 
         #Create a multidev environment on your awesome site
-        echo " \033[1;97;46m[notice]\033[0m Creating a multidev environment - \033[1;32;40m$MD_NAME\033[0m on \033[1;32;40m$SITE\033[0m site from the \033[1;32;40m$FROM\033[0m environment."
+        echo " \033[1;97;46m[notice]\033[0m Creating a multidev environment - \033[1;32;40m$MD_NAME\033[0m on \033[1;32;40m$SITE\033[0m site from the \033[1;32;40m$FROM_ENV\033[0m environment."
         echo " \033[1;97;46m[notice]\033[0m Please stand by, this might take a minute or two..."
-        terminus multidev:create $SITE.$FROM $MD_NAME
+        terminus multidev:create $SITE.$FROM_ENV $MD_NAME
 
         # Display connection info of a newly created environment
         echo "";

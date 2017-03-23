@@ -4,38 +4,57 @@
 # Usage info
 show_help() {
     cat <<"EOF"
-usage: mode <command> [<args>]
 
-These are the available commands that can be passed to a script:
+usage:
+    sh connection-set.sh <command> [<args>]
+or
+    mode <command> [<args>]
+
+These are the commands that are accepted by the script:
     sftp   Sets SFTP connection mode on a development environment (excludes Test and Live).
     git    Sets Git connection mode on a development environment (excludes Test and Live).
 
-These are the options that can be passed to a script:
+These are the arguments that are accepted by the script:
     [-s=<site>] and [-e=<environment>]
-Arguments are optional. You'll be prompted to enter them, if skipped at script call.
 
 Example usage:
-    mode sftp -s mysite -e dev
-    mode sftp
+    '$ sh connection-set.sh -s yoursite -e dev'
+    '$ mode sftp -s yoursite -e dev'
+    '$ mode sftp'
+
+To cancel a currently running command/script, press [Ctrl+C]
+
 EOF
 }
 
-if [[ $# -eq 0 || $1 == "-h" || $1 == "--help" ]]; then
+ALIAS="mode"
+
+if [[ $1 == "-h" || $1 == "--help" ]]; then
     show_help
+    exit 1
 elif [[ $1 == "git" || $1 == "sftp" ]]; then
     MODE=$1
     shift
 
     while getopts ":s:e:" option; do
         case "${option}" in
-            s) SITE=${OPTARG};;
-            e) ENV=${OPTARG};;
-            :) echo " Option -$OPTARG requires an argument. See 'mode --help'.";;
+            s)
+                SITE=${OPTARG}
+            ;;
+            e)
+                ENV=${OPTARG}
+            ;;
+            :)
+                echo " Option -$OPTARG requires an argument. See '$ALIAS --help'."
+            ;;
             \?)
                 echo " \033[1;97;46m[notice]\033[0m Invalid option: -$OPTARG" >&2
                 show_help
-                exit 1;;
-            *) echo " mode: unknown option -$OPTARG. See 'mode --help'.";;
+                exit 1
+            ;;
+            *)
+                echo " $ALIAS: unknown option -$OPTARG. See '$ALIAS --help'."
+            ;;
         esac
     done
 
@@ -56,5 +75,5 @@ elif [[ $1 == "git" || $1 == "sftp" ]]; then
     echo " \033[1;97;46m[notice]\033[0m Setting \033[1;32;40m$SITE\033[0m.\033[1;32;40m$ENV\033[0m environment's connection mode to \033[1;32;40m$MODE\033[0m..."
     terminus connection:set $SITE.$ENV $MODE;
 else
-    echo " mode: <$1> is not a valid mode <command>. See 'mode --help'."
+    echo " mode: <$1> is not a valid $ALIAS <command>. See '$ALIAS --help'."
 fi

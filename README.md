@@ -1,12 +1,11 @@
 # Terminus Scripts
 
-This is a project meant to help with everyday work with terminus using command line.
+This is a project for the [Pantheon](https://pantheon.io/) clients, who want to utilize it's command line interface, [Terminus](https://pantheon.io/docs/terminus/).
+The scripts are meant to ease the everyday work with Terminus, so you don't have to remember all the commands and parameters.
 
 ## Requirements
 
-**This project uses shell aliases to call scripts as commands, however it's not required.**
-
-You can call a script using the syntax:
+**This project uses shell aliases to call scripts as commands, however it's not required.** So you can call a script using the syntax:
 ```bash
 $ sh terminus-scripts/[script-name].sh command options
 ```
@@ -28,7 +27,7 @@ $ sh path-to-scripts/terminus-scripts/connection-set.sh sftp -s yoursite -e dev
 ```
 This will set `yoursite` connection of `dev` environment to `sftp` mode (excludes Test and Live)
 
-If you have an alias called `mode`, which calls the `connection-set.sh` script, you can alternatively type this:
+If you have an alias called `mode`, which runs the `connection-set.sh` script, you can alternatively type this:
 ```bash
 $ mode sftp -s yoursite -e dev
 ```
